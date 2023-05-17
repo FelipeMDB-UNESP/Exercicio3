@@ -1,3 +1,6 @@
+#ifndef HNO_H
+#define HNO_H
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -10,3 +13,5 @@ typedef struct no{
     struct no* proximo;
     struct no* anterior;
 } No;
+
+#endif /* HNO_H */

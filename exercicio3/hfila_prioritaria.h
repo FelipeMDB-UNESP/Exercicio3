@@ -1,19 +1,14 @@
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-
-typedef struct clienteP{
-
-    char        nome[100];
-    char             tipo;
-    int  tamanho_carrinho;
-    int        prioridade;
-} ClienteP;
+#include "hcliente.h"
+#include "hfila.h"
 
 typedef struct no_prioritario{
 
-    ClienteP cliente_prioritario;
+    Cliente cliente_prioritario;
     struct no_prioritario* proximo;
     struct no_prioritario* anterior;
 } NoPrioritario;
@@ -34,11 +29,7 @@ Fila_Prioritaria* criar_fila_prioritaria(){
     return fila;
 }
 
-bool isVazia_prioritaria(Fila_Prioritaria* fila){
-    return fila->primeiro == NULL;
-}
-
-void adicionar_na_fila_prioritaria(Fila_Prioritaria* fila, ClienteP cliente_prioritario){
+void adicionar_na_fila_prioritaria(Fila_Prioritaria* fila, Cliente cliente_prioritario){
     NoPrioritario* novoNo = (NoPrioritario*)malloc(sizeof(NoPrioritario));
     strcpy(novoNo->cliente_prioritario.nome, cliente_prioritario.nome);
     novoNo->cliente_prioritario.tipo = cliente_prioritario.tipo;
@@ -47,7 +38,7 @@ void adicionar_na_fila_prioritaria(Fila_Prioritaria* fila, ClienteP cliente_prio
     novoNo->proximo = NULL;
     novoNo->anterior = NULL;
 
-    if (isVazia_prioritaria(fila)) {
+    if (isVazia(fila)) {
         fila->primeiro = novoNo;
         fila->ultimo = novoNo;
     } else {
@@ -58,15 +49,14 @@ void adicionar_na_fila_prioritaria(Fila_Prioritaria* fila, ClienteP cliente_prio
     fila->qtd_nos++;
 }
 
-void remover_da_fila_prioritaria(Fila_Prioritaria* fila){
+/*void remover_da_fila_prioritaria_sem_priorizar(Fila_Prioritaria* fila){
 
-    if(isVazia_prioritaria(fila)) {
+    if(isVazia(fila)) {
         printf("A fila esta vazia. \n");
-        return;
     }
 
     NoPrioritario* aux = fila->primeiro;
-    ClienteP cliente_prioritario = aux->cliente_prioritario;
+    Cliente cliente_prioritario = aux->cliente_prioritario;
 
     fila->primeiro = fila->primeiro->proximo;
 
@@ -77,30 +67,31 @@ void remover_da_fila_prioritaria(Fila_Prioritaria* fila){
     }
 
     fila->qtd_nos--;
-}
+}*/
 
 int encontrar_maior_prioridade(Fila_Prioritaria* fila){
 
     NoPrioritario* atual = fila->primeiro;
-    int prioridade = 0;
+    int maior_prioridade = 0;
 
     while(atual != NULL) {
-        if(atual->cliente_prioritario.prioridade > prioridade){
-            prioridade = atual->cliente_prioritario.prioridade;
+        if(atual->cliente_prioritario.prioridade > maior_prioridade){
+            maior_prioridade = atual->cliente_prioritario.prioridade;
         }
         atual = atual->proximo;
     }
 
-    return prioridade;
+    return maior_prioridade;
 }
 
-void remover_da_fila_elemento_prioritario(Fila_Prioritaria* fila){
+Cliente remover_da_fila_elemento_prioritario(Fila_Prioritaria* fila){
 
     int maior_prioridade = encontrar_maior_prioridade(fila);
     NoPrioritario* atual = fila->primeiro;
 
     while (atual != NULL) {
         if (atual->cliente_prioritario.prioridade == maior_prioridade) {
+            Cliente cliente_removido = atual->cliente_prioritario;
             if (atual == fila->primeiro) {
                 remover_da_fila(fila);
             } else if (atual == fila->ultimo) {
@@ -112,16 +103,19 @@ void remover_da_fila_elemento_prioritario(Fila_Prioritaria* fila){
                 atual->proximo->anterior = atual->anterior;
                 fila->qtd_nos--;
             }
-            return;
+            return cliente_removido;
         }
         atual = atual->proximo;
     }
+
+    Cliente cliente_vazio;
+    return cliente_vazio;
 }
 
-int get_tamanho_prioritario(Fila_Prioritaria* fila){
+/*int get_tamanho_prioritario(Fila_Prioritaria* fila){
 
     return fila->qtd_nos;
-}
+}*/
 
 void liberar_fila_prioritaria(Fila_Prioritaria* fila) {
     NoPrioritario* atual = fila->primeiro;
@@ -131,4 +125,14 @@ void liberar_fila_prioritaria(Fila_Prioritaria* fila) {
         atual = proximo;
     }
     free(fila);
+}
+
+float calcular_tempo_medio_de_servico_fila_prioritaria(Fila_Prioritaria* fila){
+
+    float tempo_total = 0;
+    NoPrioritario* atual = fila->primeiro;
+    while (atual != NULL) {
+        tempo_total = tempo_total + atual->cliente_prioritario.tamanho_carrinho;
+    }
+    return (tempo_total/fila->qtd_nos);
 }

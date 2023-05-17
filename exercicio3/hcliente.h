@@ -9,8 +9,9 @@
 typedef struct cliente{
 
     char        nome[100];
-    char             tipo;
+    int              tipo;
     int  tamanho_carrinho;
+    int        prioridade;
 } Cliente;
 
 #endif /* CLIENTE_H */

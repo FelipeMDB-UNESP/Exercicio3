@@ -1,3 +1,7 @@
+#ifndef HFILA_H
+#define HFILA_H
+
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -27,7 +31,7 @@ Fila* criar_fila(){
     return fila;
 }
 
-bool isVaziaFila(Fila* fila){
+bool isVazia(Fila* fila){
     return fila->primeiro == NULL;
 }
 
@@ -36,10 +40,11 @@ void adicionar_na_fila(Fila* fila, Cliente cliente){
     strcpy(novoNo->cliente.nome, cliente.nome);
     novoNo->cliente.tamanho_carrinho = cliente.tamanho_carrinho;
     novoNo->cliente.tipo = cliente.tipo;
+    novoNo->cliente.prioridade = cliente.prioridade;
     novoNo->proximo = NULL;
     novoNo->anterior = NULL;
 
-    if (isVaziaFila(fila)) {
+    if (isVazia(fila)) {
         fila->primeiro = novoNo;
         fila->ultimo = novoNo;
     } else {
@@ -50,9 +55,9 @@ void adicionar_na_fila(Fila* fila, Cliente cliente){
     fila->qtd_nos++;
 }
 
-void remover_da_fila(Fila* fila){
+Cliente remover_da_fila(Fila* fila){
 
-    if(isVaziaFila(fila)) {
+    if(isVazia(fila)) {
         printf("A fila esta vazia. \n");
     }
 
@@ -69,6 +74,7 @@ void remover_da_fila(Fila* fila){
 
     free(aux);
     fila->qtd_nos--;
+    return cliente;
 }
 
 int get_tamanho(Fila* fila){
@@ -85,3 +91,15 @@ void liberar_fila(Fila* fila) {
     }
     free(fila);
 }
+
+float calcular_tempo_medio_de_servico(Fila* fila){
+
+    float tempo_total = 0;
+    No* atual = fila->primeiro;
+    while (atual != NULL) {
+        tempo_total = tempo_total + atual->cliente.tamanho_carrinho;
+    }
+    return (tempo_total/fila->qtd_nos);
+}
+
+#endif /* HFILA_H */
