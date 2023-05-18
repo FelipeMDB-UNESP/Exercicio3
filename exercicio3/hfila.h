@@ -98,8 +98,52 @@ float calcular_tempo_medio_de_servico(Fila* fila){
     No* atual = fila->primeiro;
     while (atual != NULL) {
         tempo_total = tempo_total + atual->cliente.tamanho_carrinho;
+        atual = atual->proximo;
     }
-    return (tempo_total/fila->qtd_nos);
+    return (tempo_total/(float)fila->qtd_nos);
+}
+
+int encontrar_maior_prioridade(Fila* fila){
+
+    No* atual = fila->primeiro;
+    int maior_prioridade = 0;
+
+    while(atual != NULL) {
+        if(atual->cliente.prioridade > maior_prioridade){
+            maior_prioridade = atual->cliente.prioridade;
+        }
+        atual = atual->proximo;
+    }
+
+    return maior_prioridade;
+}
+
+Cliente remover_da_fila_elemento_prioritario(Fila* fila){
+
+    int maior_prioridade = encontrar_maior_prioridade(fila);
+    No* atual = fila->primeiro;
+
+    while (atual != NULL) {
+        if (atual->cliente.prioridade == maior_prioridade) {
+            Cliente cliente_removido = atual->cliente;
+            if (atual == fila->primeiro) {
+                remover_da_fila(fila);
+            } else if (atual == fila->ultimo) {
+                fila->ultimo = atual->anterior;
+                fila->ultimo->proximo = NULL;
+                fila->qtd_nos--;
+            } else {
+                atual->anterior->proximo = atual->proximo;
+                atual->proximo->anterior = atual->anterior;
+                fila->qtd_nos--;
+            }
+            return cliente_removido;
+        }
+        atual = atual->proximo;
+    }
+
+    Cliente cliente_vazio;
+    return cliente_vazio;
 }
 
 #endif /* HFILA_H */
